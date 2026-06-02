@@ -7,7 +7,8 @@ import databaseConfig from '@config/database.config';
 import jwtConfig from '@config/jwt.config';
 import minioConfig from '@config/minio.config';
 import { envValidationSchema } from '@config/env.validation';
-import { PrismaModule } from './prisma/prisma.module';
+import { PrismaModule} from './prisma/prisma.modules';
+import { HealthModule } from './health/health.module';
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { PrismaModule } from './prisma/prisma.module';
 			},
 		}),
 		PrismaModule,
+		HealthModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
