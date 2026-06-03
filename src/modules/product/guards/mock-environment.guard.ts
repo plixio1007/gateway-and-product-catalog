@@ -3,15 +3,25 @@ import {
 	ExecutionContext,
 	ForbiddenException,
 	Injectable,
+	Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MockEnvironmentGuard implements CanActivate {
+	private readonly logger = new Logger(MockEnvironmentGuard.name);
+
 	constructor(private readonly configService: ConfigService) {}
 
 	canActivate(context: ExecutionContext): boolean {
-		void context;
+		const contextType = context.getType<string>();
+		if (contextType !== 'graphql') {
+			this.logger.warn(`Rejected non-GraphQL context type: ${contextType}`);
+			throw new ForbiddenException(
+				'Mocking mutations are only available via GraphQL',
+			);
+		}
+
 		const environment =
 			this.configService.get<string>('NODE_ENV') ?? 'development';
 
@@ -26,7 +36,7 @@ export class MockEnvironmentGuard implements CanActivate {
 		}
 
 		throw new ForbiddenException(
-			'Mocking mutations are only allowed in development or staging environments',
+			`Mocking mutations are not allowed in '${environment}' environment`,
 		);
 	}
 }

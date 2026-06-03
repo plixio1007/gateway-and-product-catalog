@@ -97,6 +97,8 @@ mutation {
 }
 ```
 
+Replace `<product-id>` with a real UUID from seeded products.
+
 - Allowed environments: `development`, `staging`
 - Production response: `403 Forbidden` with message `Mocking mutations are not allowed in production`
 

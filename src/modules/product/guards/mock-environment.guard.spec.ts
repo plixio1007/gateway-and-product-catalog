@@ -10,25 +10,39 @@ describe('MockEnvironmentGuard', () => {
 
 		return new MockEnvironmentGuard(configService);
 	};
+	const graphqlContext = { getType: jest.fn().mockReturnValue('graphql') };
 
 	it('allows mocking mutation in development', () => {
 		const guard = createGuard('development');
 
-		expect(guard.canActivate({} as never)).toBe(true);
+		expect(guard.canActivate(graphqlContext as never)).toBe(true);
 	});
 
 	it('allows mocking mutation in staging', () => {
 		const guard = createGuard('staging');
 
-		expect(guard.canActivate({} as never)).toBe(true);
+		expect(guard.canActivate(graphqlContext as never)).toBe(true);
 	});
 
 	it('throws 403 for production', () => {
 		const guard = createGuard('production');
 
-		expect(() => guard.canActivate({} as never)).toThrow(ForbiddenException);
-		expect(() => guard.canActivate({} as never)).toThrow(
+		expect(() => guard.canActivate(graphqlContext as never)).toThrow(
+			ForbiddenException,
+		);
+		expect(() => guard.canActivate(graphqlContext as never)).toThrow(
 			'Mocking mutations are not allowed in production',
+		);
+	});
+
+	it('throws 403 for unsupported environment', () => {
+		const guard = createGuard('test');
+
+		expect(() => guard.canActivate(graphqlContext as never)).toThrow(
+			ForbiddenException,
+		);
+		expect(() => guard.canActivate(graphqlContext as never)).toThrow(
+			"Mocking mutations are not allowed in 'test' environment",
 		);
 	});
 });

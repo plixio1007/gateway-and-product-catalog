@@ -39,12 +39,12 @@ async function main() {
 		const category = categories[index % categories.length];
 		const adjective = adjectives[index % adjectives.length];
 		const productNumber = index + 1;
-		const status: AuctionStatus =
-			productNumber % 10 === 0
-				? AuctionStatus.CLOSED
-				: productNumber % 4 === 0
-					? AuctionStatus.SOLD
-					: AuctionStatus.ACTIVE;
+		let status: AuctionStatus = AuctionStatus.ACTIVE;
+		if (productNumber % 10 === 0) {
+			status = AuctionStatus.CLOSED;
+		} else if (productNumber % 4 === 0) {
+			status = AuctionStatus.SOLD;
+		}
 		const price = Number((49 + productNumber * 7.35).toFixed(2));
 
 		return {
