@@ -74,11 +74,33 @@ Run the following commands in order to provision your database structure and cli
 ```
 
 - **Seed Initial Data:**
-  Populates the database with essential seed definitions (e.g., default administrator profile).
+  Resets product data and populates database with 50 realistic auction-ready sample products plus default administrator profile.
 
 ```bash
   npx ts-node prisma/seed.ts
 ```
+
+## 🔁 Mock Auction State Transition (GraphQL)
+
+Use GraphQL Playground/Sandbox to simulate Kafka/stream-like auction transitions:
+
+```graphql
+mutation {
+  mockAuctionStateTransition(
+    input: { productId: "<product-id>", status: SOLD }
+  ) {
+    id
+    name
+    status
+    price
+  }
+}
+```
+
+Replace `<product-id>` with a real UUID from seeded products.
+
+- Allowed environments: `development`, `staging`
+- Production response: `403 Forbidden` with message `Mocking mutations are not allowed in production`
 
 ---
 

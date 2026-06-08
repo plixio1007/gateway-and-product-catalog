@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { PrismaClient } from '@prisma/client';
+import { AuctionStatus, PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -10,6 +10,55 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
 	console.log('🌱 Mulai seeding database...');
+
+	await prisma.product.deleteMany();
+	console.log('🧹 Existing products cleared');
+
+	const categories = [
+		'Vintage Camera',
+		'Gaming Console',
+		'Mechanical Keyboard',
+		'Smart Watch',
+		'Limited Sneaker',
+		'Bluetooth Speaker',
+		'Designer Handbag',
+		'Collectible Figure',
+		'Mountain Bike',
+		'Noise Cancelling Headphones',
+	];
+
+	const adjectives = [
+		'Premium',
+		'Exclusive',
+		'Collector Edition',
+		'Refurbished',
+		'Like New',
+	];
+
+	const products = Array.from({ length: 50 }, (_, index) => {
+		const category = categories[index % categories.length];
+		const adjective = adjectives[index % adjectives.length];
+		const productNumber = index + 1;
+		let status: AuctionStatus = AuctionStatus.ACTIVE;
+		if (productNumber % 10 === 0) {
+			status = AuctionStatus.CLOSED;
+		} else if (productNumber % 4 === 0) {
+			status = AuctionStatus.SOLD;
+		}
+		const price = Number((49 + productNumber * 7.35).toFixed(2));
+
+		return {
+			name: `${adjective} ${category} #${productNumber}`,
+			description: `${category} with complete accessories, tested quality, and ready for auction simulation.`,
+			price,
+			status,
+		};
+	});
+
+	await prisma.product.createMany({
+		data: products,
+	});
+	console.log(`✅ ${products.length} sample products created`);
 
 	const admin = await prisma.user.upsert({
 		where: { email: 'admin@plixio.com' },
